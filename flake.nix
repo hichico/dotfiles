@@ -1,24 +1,22 @@
 {
-  description = "Chico's Nix system configs";
-  
-  # Inputs are the places where we get our software.
-  # Giant monorepo with recipes called derivations that say how to build software.
+  description = "My Home Manager flake";
+
   inputs = {
-    # Package sets
-    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixpkgs-23.05-darwin";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
-    # Controls systems level software and settings incluiding fonts
-    darwin.url = "github:lnl7/nix-darwin";
-    darwin.inputs.nixpkgs.follows = "nixpkgs-unstable";      
-
-    # Manages config links into your config links
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs: {
-
+  outputs = { home-manager, ...} @inputs: {
+    defaultPackage.x86_64-darwin = home-manager.defaultPackage.x86_64-darwin;
+ 
+    homeConfigurations = {
+        chico = inputs.home-manager.lib.homeManagerConfiguration {
+        system = "x86_64-darwin";
+        homeDirectory = "/Users/shik0";
+        username = "chico";
+        configuration.imports = [ ./darwin/defaults.nix ];
+      };
+    };
   };
 }
