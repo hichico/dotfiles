@@ -34,6 +34,7 @@
         wget
         xz # extract XZ archives
         rustup
+        zola
       ;
 
       # Development
