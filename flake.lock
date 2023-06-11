@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "comma": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1686077956,
+        "narHash": "sha256-zkkjqU5NZipqakDfPSve85ljyZJ8aQtfk9mPkJ+w3IE=",
+        "owner": "Shopify",
+        "repo": "comma",
+        "rev": "59a88b9b86bc35ee6c5ec02fab6819ad68bdaa3f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shopify",
+        "repo": "comma",
+        "type": "github"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -75,6 +91,7 @@
     },
     "root": {
       "inputs": {
+        "comma": "comma",
         "darwin": "darwin",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
