@@ -40,6 +40,38 @@
         );
       };
 
+      homeManagerStateVersion = "23.05";
+
+      primaryUserInfo = {
+        username = "shik0";
+        fullName = "Chico Pereira";
+        email = "olachico@icloud.com";
+        nixConfigDirectory = "/Users/shik0/Developer/dotfiles";
+      };
+
+      # Modules shared by most `nix-darwin` personal configurations.
+      nixDarwinCommonModules = attrValues self.darwinModules ++ [
+
+        # `home-manager` module
+        home-manager.darwinModules.home-manager(
+          { config, lib, pkgs, ... }:
+          let
+            inherit (config.users) primaryUser;
+          in {
+            nixpkgs = nixpkgsConfig;
+
+            # `home-manager` configuration.
+            users.users.${primaryUser.username}.home = "/Users/${primaryUser.username}";
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.${primaryUser.username} = {
+              imports = attrValues self.homeManagerModules;
+              home.stateVersion = homeManagerStateVersion;
+            };
+          }
+        )
+      ];
+
     in {
 
       # My `nix-darwin` configs
@@ -48,17 +80,9 @@
         # My personal Macbook Pro from 2016
         mbp2016 = darwinSystem {
           system = "x86_64-darwin";
-          modules = attrValues self.darwinModules ++ [
-
-            # My main 'nix-darwin' configuration
-            ./configuration.nix
-            
-            # My home-manager module configuration
-            home-manager.darwinModules.home-manager {
-              nixpkgs = nixpkgsConfig;
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.shik0 = import ./home.nix; 
+          modules = nixDarwinCommonModules ++ [
+            {
+              config.users.primaryUser = primaryUserInfo;
             }
           ];
         };
@@ -68,10 +92,18 @@
       overlays = {};
 
       # TODO: Darwin Modules
-      darwinModules = {};
+      darwinModules = {
+        general-bootstrap = import ./darwin/bootstrap.nix;
+        general-defaults = import ./darwin/defaults.nix;
+
+        # Modules pending upstream
+        users-primaryUser = import ./darwin/users.nix;
+      };
 
       # TODO: Home Manager Modules
-      homeManagerModules = {};
+      homeManagerModules = {
+        general-fish = import ./home/fish.nix;
+      };
     };
 }
   
