@@ -55,5 +55,4 @@
     FXEnableExtensionChangeWarning = true;
   };
 
-  programs.fish.enable = true;
 }
