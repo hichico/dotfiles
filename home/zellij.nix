@@ -2,8 +2,6 @@
   # Zellij terminal multiplexer
   programs.zellij.enable = true;
 
-  programs.zellij.enableFishIntegration = true;
-
   programs.zellij.settings = {
     theme = "tokyonight";
     
