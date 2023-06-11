@@ -6,4 +6,5 @@ let
 in {
 
   programs.fish.enable = true;
+  programs.bat.enable = true;
 } 

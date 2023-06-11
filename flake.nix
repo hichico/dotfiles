@@ -15,9 +15,6 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    # Other Resources
-    comma = { url = "github:Shopify/comma"; flake = false; };
-
   };
 
   outputs = { self, nixpkgs, darwin, home-manager, ... } @inputs :
@@ -68,6 +65,9 @@
               imports = attrValues self.homeManagerModules;
               home.stateVersion = homeManagerStateVersion;
             };
+
+            # Add a registry entry for this flake
+            nix.registry.my.flake = self;
           }
         )
       ];
@@ -103,6 +103,8 @@
       # TODO: Home Manager Modules
       homeManagerModules = {
         general-fish = import ./home/fish.nix;
+        general-starship = import ./home/starship.nix;
+        general-packages = import ./home/packages.nix;
       };
     };
 }
