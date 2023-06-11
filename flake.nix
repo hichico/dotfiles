@@ -105,6 +105,8 @@
         general-fish = import ./home/fish.nix;
         general-starship = import ./home/starship.nix;
         general-packages = import ./home/packages.nix;
+        general-helix = import ./home/helix.nix;
+        general-zellij = import ./home/zellij.nix;
       };
     };
 }

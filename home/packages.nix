@@ -33,8 +33,6 @@
         upterm # secure terminal sharing
         wget
         xz # extract XZ archives
-        helix # Modal editor
-        zellij # Terminal multiplexer
         rustup
       ;
 
