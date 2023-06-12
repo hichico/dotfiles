@@ -103,6 +103,7 @@
       # TODO: Home Manager Modules
       homeManagerModules = {
         general-fish = import ./home/fish.nix;
+        general-git = import ./home/git.nix;
         general-starship = import ./home/starship.nix;
         general-packages = import ./home/packages.nix;
         general-helix = import ./home/helix.nix;
