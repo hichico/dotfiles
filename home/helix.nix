@@ -10,7 +10,12 @@
       line-number = "relative";
       lsp.display-messages = true;
       auto-format = true;
-    };
+      cursor-shape = {        
+        insert = "bar";
+        normal = "block";
+        select = "underline";
+      };
 
+    };
   };
 }
