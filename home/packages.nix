@@ -55,6 +55,7 @@
       # Node Packages
       inherit (pkgs.nodePackages)
         ts-node
+        pnpm
         typescript-language-server
         vscode-langservers-extracted
         yaml-language-server

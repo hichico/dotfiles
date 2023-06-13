@@ -7,6 +7,7 @@
     theme = "tokyonight";
 
     editor = {
+      auto-save = true;
       line-number = "relative";
       lsp.display-messages = true;
       auto-format = true;

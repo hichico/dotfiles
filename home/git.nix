@@ -5,29 +5,30 @@ let
 
 in
   {
-    programs.git.enable = true;
+    programs.git = {
+    
+      enable = true;
 
-    userEmail = config.home.user-info.email;
+      # Enhanced diffs
+      delta.enable = true;
 
-    # Enhanced diffs
-    delta.enable = true;
+      ignores = [
+        "*~"
+        "*.swp"
+        ".DS_Store"
+      ];
 
-    ignores = [
-      "*~"
-      "*.swp"
-      ".DS_Store"
-    ];
+      extraConfig = {
+        init.defaultBranch = "main";
+        core.editor = "helix";
+        diff.colorMoved = "default";
+        pull.rebase = true;
 
-    extraConfig = {
-      init.defaultBranch = "main";
-      core.editor = "helix";
-      diff.colorMoved = "default";
-      pull.rebase = true;
+        # For supercede
+        core.symlinks = true;
 
-      # For supercede
-      core.symlinks = true;
-
-      # Automatically set uptream
-      push.autoSetupRemote = true;
+        # Automatically set uptream
+        push.autoSetupRemote = true;
+      };
     };
   }
