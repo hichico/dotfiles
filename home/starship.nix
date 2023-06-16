@@ -9,5 +9,8 @@
     hostname.style = "bold green";
     memory_usage.disabled = true; # because it includes cached memory it's reported as full a lot
     username.style_user = "bold blue";
+    package.disabled = true;
+    nodejs.disabled = true;
+    rust.disabled = true;
   };
 }
