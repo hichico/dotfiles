@@ -29,6 +29,16 @@ in
 
         # Automatically set uptream
         push.autoSetupRemote = true;
+
+        # Aliases
+        aliases = {
+          a = "add";
+          aa = "add --all";
+          pl = "pull";
+          pu = "push";
+          puf = "push --force";
+          s = "status";
+        };
       };
     };
   }
