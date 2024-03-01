@@ -1,0 +1,566 @@
+#+TITLE: Emacs Configuration
+#+PROPERTY: header-args:emacs-lisp :tangle ./.emacs.d/init.el
+
+* Package System Setup
+
+#+begin_src emacs-lisp
+
+  ;; Initialize package sources
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  ;; Initialize use-package on non-Linux platforms
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+  (setq use-package-always-defer t)
+
+#+end_src
+
+* General System Configuration
+
+#+begin_src emacs-lisp
+
+  ;; Setup backup files directory
+  (setq backup-directory-alist            '((".*" . "~/.Trash")))
+
+  ;; On Mac create super and meta modifiers
+  (setq mac-option-modifier 'super)
+  (setq mac-command-modifier 'meta)
+
+  ;; Setup auto save
+  (setq auto-save-interval 1000)
+
+#+end_src
+
+* Basic UI Configuration
+
+#+begin_src emacs-lisp
+
+
+  ;; Setup Line Numbers
+  (global-display-line-numbers-mode t)
+
+  ;; Disable Line Numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  dired-mode-hook
+                  vterm-mode-hook
+                  shell-mode-hook
+                  term-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+  ;; Make ESC quit prompts
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+  (scroll-bar-mode -1)      ; Disable visible scrollbar
+  (tool-bar-mode -1)        ; Disable the toolbar
+  (tooltip-mode -1)         ; Disable tooltips
+  (set-fringe-mode 10)      ; Give some breathing room
+  (menu-bar-mode -1)        ; Disable the menu bar
+  (desktop-save-mode 1)
+
+#+end_src
+
+* General Packages
+
+** Beacon
+
+Beacon is a package that makes you never lose your mouse cursor again, it will highlight a line where your mouse cursor is.
+
+#+begin_src emacs-lisp
+(use-package beacon)
+#+end_src
+
+** Focus
+
+Focus dims  surrounding text while typing
+
+#+begin_src emacs-lisp
+(use-package focus)
+#+end_src
+
+** Rainbow Mode
+
+Display the actual color for a hex value, works in all modes
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :hook org-mode prog-mode)
+#+end_src
+
+** Rainbow Delimiters
+
+Usage of delimeters
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook ((org-mode . rainbow-delimiters-mode)
+               (prog-mode . rainbow-delimiters-mode)))
+#+end_src
+
+** Magit
+
+#+begin_src emacs-lisp
+  
+  (use-package magit
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+#+end_src
+
+** Projectile
+
+#+begin_src emacs-lisp
+
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-x p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/Developer")
+      (setq projectile-project-search-path '("~/Developer")))
+    (setq projectile-switch-project-action #'projectile-dired))
+
+  (use-package counsel-projectile
+    :config (counsel-projectile-mode))
+  
+#+end_src
+
+** Perspective
+
+#+begin_src emacs-lisp
+
+  (use-package perspective
+    :ensure t
+    :bind (("C-x k" . persp-kill-buffer))
+    :custom (persp-mode-prefix-key (kbd "C-x x"))
+    :init
+    (persp-mode))
+  
+#+end_src
+
+** Hydra
+
+#+begin_src emacs-lisp
+
+  (use-package hydra)
+
+  (defhydra hydra-text-scale (:timeout 4)
+            "scale text"
+            ("w" text-scale-increase "in")
+            ("s" text-scale-decrease "out")
+            ("ESC" nil "finished" :exit t))
+  
+#+end_src
+
+** Ivy
+
+#+begin_src emacs-lisp
+
+  (use-package ivy
+  :diminish
+  :config
+  (ivy-mode 1))
+
+    (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
+
+#+end_src
+
+** All the icons
+
+#+begin_src emacs-lisp
+
+      ;; NOTE: The first time you load your configuration on a new machine
+    ;; you'll need to run the following command interactively so that mode line icons display correct
+    ;; M-x all-the-icons-install-fonts
+
+    (use-package all-the-icons
+      :demand t)
+  
+#+end_src
+
+** Doom Styles
+
+#+begin_src emacs-lisp
+
+  (use-package doom-modeline
+     :demand t
+     :init (doom-modeline-mode 1))
+
+   (use-package doom-themes
+     :demand t
+     :config
+     ;; Global settings (defaults)
+     (setq doom-themes-enable-bold t
+           doom-themes-enable-italic t)
+     (load-theme 'doom-gruvbox t)
+
+     ;; Corrects (and improves) org mode's native fontification
+     (doom-themes-org-config))
+  
+#+end_src
+
+** Which Key
+
+#+begin_src emacs-lisp
+
+  (use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3
+            which-key-side-window-location 'bottom
+            which-key-sort-order #'which-key-key-order
+            which-key-allow-imprecise-window-fit nil
+            which-key-sort-uppercase-first nil
+            which-key-add-column-padding 1
+            which-key-max-display-columns nil
+            which-key-min-display-lines 6
+            which-key-side-window-slot -10
+            which-key-side-window-max-height 0.25))
+
+#+end_src
+
+** Counsel
+
+#+begin_src emacs-lisp
+
+  (use-package counsel
+    :bind (("M-x" . counsel-M-x)
+           ("C-x b" . counsel-ibuffer)
+           ("C-x C-f" . counsel-find-file)
+           :map minibuffer-local-map
+           ("C-r" . 'counsel-minibuffer-history))
+    :config
+    (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+  
+#+end_src
+
+** Helpful
+
+#+begin_src emacs-lisp
+
+  (use-package helpful
+    :ensure t
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+  
+#+end_src
+** Company
+
+#+begin_src emacs-lisp
+  (use-package company)
+#+end_src
+
+** Highlight Indent Guides
+
+#+begin_src emacs-lisp
+  (use-package highlight-indent-guides
+    :ensure t
+    :hook (python-ts-mode . highlight-indent-guides-mode)
+    :config
+       (setq highlight-indent-guides-method 'character))
+#+end_src
+* Org Mode
+
+** Basic Config
+
+#+begin_src emacs-lisp
+  (defun fp/org-mode-setup ()
+     (org-indent-mode)
+     (variable-pitch-mode 1)
+     (auto-fill-mode 0)
+     (visual-line-mode 1))
+
+   (use-package org
+     :hook (org-mode . fp/org-mode-setup)
+     :config
+     (setq org-agenda-files '("~/OrgFiles/tasks.org"))
+     (setq org-agenda-start-with-log-mode t)
+     (setq org-log-time 'time)
+     (setq org-log-into-drawer t)
+     (setq org-todo-keywords
+           '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(d!)")
+             (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+     ;; Put manually exclusive tags here
+     (setq org-tag-list
+           '((:startgroup)
+             ("@errand" . ?E)
+             ("@home" . ?H)
+             ("@work" . ?W)
+             ("agenda" . ?a)
+             ("planning" . ?p)
+             ("publish" . ?P)
+             ("batch" . ?b)
+             ("note" . ?n)
+             ("idea" . ?i)))
+     ;; Configure custom agenda views
+     (setq org-agenda-custom-commands
+           '(("d" "Dashboard"
+              ((agenda "" ((org-deadline-warining-days 7)))
+               (todo "NEXT"
+                     ((org-agenda-overriding-header "Next Tasks")))
+               (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+             ("n" "Next Tasks"
+              ((todo "NEXT"
+                     ((org-agenda-overriding-header "Next Tasks")))))
+             ("W" "Work Tasks" tags-todo "+work")
+             ;; Low-effort next actions
+             ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+              ((org-agenda-overriding-header "Low Effort Tasks")
+               (org-agenda-max-todos 20)
+               (org-agenda-files org-agenda-files)))
+
+             ("w" "Workflow Status"
+              ((todo "WAIT"
+                     ((org-agenda-overriding-header "Waiting on External")
+                      (org-agenda-files org-agenda-files)))
+               (todo "REVIEW"
+                     ((org-agenda-overriding-header "In Review")
+                      (org-agenda-files org-agenda-files)))
+               (todo "PLAN"
+                     ((org-agenda-overriding-header "In Planning")
+                      (org-agenda-todo-list-sublevels nil)
+                      (org-agenda-files org-agenda-files)))
+               (todo "BACKLOG"
+                     ((org-agenda-overriding-header "Project Backlog")
+                      (org-agenda-todo-list-sublevels nil)
+                      (org-agenda-files org-agenda-files)))
+               (todo "READY"
+                     ((org-agenda-overriding-header "Ready for work")
+                      (org-agenda-files org-agenda-files)))
+               (todo "ACTIVE"
+                     ((org-agenda-overriding-header "Active Projects")
+                      (org-agenda-files org-agenda-files)))
+               (todo "COMPLETED"
+                     ((org-agenda-overriding-header "Completed Projects")
+                      (org-agenda-files org-agenda-files)))
+               (todo "CANCEL"
+                     ((org-agenda-overriding-header "Cancelled Projects")
+                      (org-agenda-files org-agenda-files)))))))
+
+     (setq org-capture-elements
+           '(("t" "Tasks / Projects")
+             ("tt" "Task" entry (file+olp "~/Orgfiles/tasks.org" "Inbox")
+              "* TODO %?\n %a\n %i" :empty-lines 1)
+             ("ts" "Clocked Entry Subtask" entry (clock)
+              "* TODO %?\ %U\n %a\n %i" :empty-lines 1))))
+
+   (use-package org-bullets
+     :after org
+     :hook (org-mode . org-bullets-mode))
+
+   (require 'org-tempo)
+
+   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+   (add-to-list 'org-structure-template-alist '("js" . "src javascript"))
+
+
+   (defun fp/org-mode-visual-fill ()
+     (setq visual-fill-column-width 100
+           visual-fill-column-center-text t)
+     (visual-fill-column-mode 1))
+#+end_src
+#+begin_src python
+Class
+#+end_src
+** Auto-tangle Configuration Files
+
+#+begin_src emacs-lisp
+
+  ;; Automatically tangle emacs.org config file when is saved
+  (defun fp/org-babel-tangle-config ()
+    (when (string-equal (buffer-file-name)
+                        (expand-file-name "~/emacs.org"))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'fp/org-babel-tangle-config)))
+  
+#+end_src
+
+** Visual Fill Column
+
+#+begin_src emacs-lisp
+
+  (use-package visual-fill-column
+  :hook (org-mode . fp/org-mode-visual-fill))
+  
+#+end_src
+
+* Development
+
+** Tree Sitter
+
+#+begin_src emacs-lisp
+
+  (use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
+#+end_src
+
+** Company
+
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0.6
+              company-minimum-prefix-length 1))
+#+end_src
+
+** Eglot
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :bind (:map eglot-mode-map
+                ("C-c d" . eldoc)
+                ("C-c a" . eglot-code-actions)
+                ("C-c r" . eglot-rename)))
+#+end_src
+
+** Languages
+
+*** Python
+
+#+begin_src emacs-lisp
+    (use-package python-mode
+      :ensure t
+      :hook ((python-ts-mode . eglot-ensure)
+                   (python-ts-mode . company-mode))
+      :bind(:map python-ts-mode-map
+                 ("<f5>" . recompile)
+                 ("<f6>" . eglot-format))
+      :mode (("//.py//'" . python-ts-mode))
+    )
+#+end_src
+
+**** Conda
+
+#+begin_src emacs-lisp
+  (use-package conda
+    :ensure t
+    :config
+    (setq conda-env-home-directory
+          (expand-file-name "~/mambaforge")))
+#+end_src
+
+*** Javascript
+
+#+begin_src emacs-lisp
+  (use-package js2-mode
+    :ensure t
+    :hook((javascript-ts-mode . eglot-ensure)
+          (javascript-ts-mode . company-mode))
+    :mode(("//.js//'" . javascript-ts-mode))
+   )
+#+end_src
+
+*** Typescript
+
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :ensure t
+    :hook((typescript-ts-mode . eglot-ensure)
+          (typescript-ts-mode . company-mode))
+    :mode(("//.ts//'" . typescript-ts-mode)
+          ("//.tsx//'" . tsx-ts-mode))
+   )
+#+end_src
+*** Go
+
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :hook((go-ts-mode . eglot-ensure)
+          (go-ts-mode . company-mode))
+    :mode(("//.go//'" . go-ts-mode))
+  )
+#+end_src
+
+* Vterm
+
+#+begin_src emacs-lisp
+
+  (use-package vterm
+    :commands vterm
+    :config
+    (setq vterm-max-scrollback 10000))
+
+#+end_src
+
+* Eshell
+
+#+begin_src emacs-lisp
+
+  (use-package eshell)
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (use-package eshell-git-prompt
+    :config
+    (eshell-git-prompt-use-theme 'powerline))
+
+#+end_src
+
+* Dired
+
+#+begin_src emacs-lisp
+
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump)))
+
+#+end_src
+
+* Garbage Collection
+
+GC is the process of freeing up memory from unused/used up variables. We set the treshold on the GC so emacs will be a little faster.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :config
+    (gcmh-mode 1))
+
+  ;; Settings of garbage collection treshold
+  (setq gc-cons-treshold 402653184
+            gc-cons-percentage 0.6)
+
+  ;; Profile emacs startup
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "*** Emacs loaded in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
+#+end_src
